@@ -271,7 +271,7 @@ void handleControlChange(byte channel, byte cc, byte value)
       strcpy(render[2], "VOLUME");
     }
   }
-    else if (cc == 10 && channel != 7)
+  else if (cc == 10 && channel != 7)
   {
     if (value < 8)
     {
@@ -301,13 +301,25 @@ void handleControlChange(byte channel, byte cc, byte value)
     {
       strcpy(render[2], "1/1");
     }
-        else if (value < 64)
+    else if (value < 64)
     {
       strcpy(render[2], "2/1");
     }
     else
     {
       snprintf(render[2], RENDER_SIZE, "%d Hz", value - 64);
+    }
+  }
+  else if (cc == 9 && channel != 7)
+  {
+    snprintf(render[2], RENDER_SIZE, "%d", value - 64);
+  }
+    else if (cc == 15)
+  {
+    if (value == 64) {
+      strcpy(render[2], "Center");
+    } else {
+      snprintf(render[2], RENDER_SIZE, "%d %s", abs(value - 64), value < 64 ? "Left" : "Right");
     }
   }
   else
