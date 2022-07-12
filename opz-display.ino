@@ -187,30 +187,127 @@ void handleControlChange(byte channel, byte cc, byte value)
 
   if (cc == 12 && channel != 7)
   {
-    if (value < 10) {
+    if (value < 10)
+    {
       strcpy(render[2], "SIN");
-    } else if (value < 21) {
+    }
+    else if (value < 21)
+    {
       strcpy(render[2], "TRI");
-    } else if (value < 32) {
+    }
+    else if (value < 32)
+    {
       strcpy(render[2], "SSQR");
-    } else if (value < 43) {
+    }
+    else if (value < 43)
+    {
       strcpy(render[2], "SAW");
-    }else if (value < 54) {
+    }
+    else if (value < 54)
+    {
       strcpy(render[2], "RND");
-    }else if (value < 64) {
+    }
+    else if (value < 64)
+    {
       strcpy(render[2], "GYRO");
-    }else if (value < 75) {
+    }
+    else if (value < 75)
+    {
       strcpy(render[2], "SIN triggered");
-    }else if (value < 85) {
+    }
+    else if (value < 85)
+    {
       strcpy(render[2], "TRI triggered");
-    }else if (value < 96) {
+    }
+    else if (value < 96)
+    {
       strcpy(render[2], "SSQR triggered");
-    }else if (value < 107) {
+    }
+    else if (value < 107)
+    {
       strcpy(render[2], "SAW triggered");
-    }else if (value < 118) {
+    }
+    else if (value < 118)
+    {
       strcpy(render[2], "RND triggered");
-    } else {
+    }
+    else
+    {
       strcpy(render[2], "ONCE triggered");
+    }
+  }
+  else if (cc == 11 && channel != 7)
+  {
+    if (value < 16)
+    {
+      strcpy(render[2], "P1");
+    }
+    else if (value < 32)
+    {
+      strcpy(render[2], "P2");
+    }
+    else if (value < 48)
+    {
+      strcpy(render[2], "CUTOFF");
+    }
+    else if (value < 64)
+    {
+      strcpy(render[2], "RES");
+    }
+    else if (value < 80)
+    {
+      strcpy(render[2], "ATTACK");
+    }
+    else if (value < 96)
+    {
+      strcpy(render[2], "PITCH");
+    }
+    else if (value < 112)
+    {
+      strcpy(render[2], "PAN");
+    }
+    else
+    {
+      strcpy(render[2], "VOLUME");
+    }
+  }
+    else if (cc == 10 && channel != 7)
+  {
+    if (value < 8)
+    {
+      strcpy(render[2], "1/64");
+    }
+    else if (value < 16)
+    {
+      strcpy(render[2], "1/32");
+    }
+    else if (value < 24)
+    {
+      strcpy(render[2], "1/16");
+    }
+    else if (value < 32)
+    {
+      strcpy(render[2], "1/8");
+    }
+    else if (value < 40)
+    {
+      strcpy(render[2], "1/4");
+    }
+    else if (value < 48)
+    {
+      strcpy(render[2], "1/2");
+    }
+    else if (value < 56)
+    {
+      strcpy(render[2], "1/1");
+    }
+        else if (value < 64)
+    {
+      strcpy(render[2], "2/1");
+    }
+    else
+    {
+      snprintf(render[2], RENDER_SIZE, "%d Hz", value - 64);
     }
   }
   else
