@@ -314,12 +314,53 @@ void handleControlChange(byte channel, byte cc, byte value)
   {
     snprintf(render[2], RENDER_SIZE, "%d", value - 64);
   }
-    else if (cc == 15)
+  else if (cc == 15)
   {
-    if (value == 64) {
+    if (value == 64)
+    {
       strcpy(render[2], "Center");
-    } else {
+    }
+    else
+    {
       snprintf(render[2], RENDER_SIZE, "%d %s", abs(value - 64), value < 64 ? "Left" : "Right");
+    }
+  }
+  else if (cc == 9 && channel == 7)
+  {
+    if (value == 0)
+    {
+      strcpy(render[2], "Off");
+    }
+    else if (value < 16)
+    {
+      snprintf(render[2], RENDER_SIZE, "%d", (int)(value / 16) + 1);
+    }
+  }
+  else if (cc == 10 && channel == 7)
+  {
+    if (value < 21>)
+    {
+      strcpy(render[2], "manual");
+    }
+    else if (value < 43)
+    {
+      strcpy(render[2], "up");
+    }
+    else if (value < 64)
+    {
+      strcpy(render[2], "down");
+    }
+    else if (value < 85)
+    {
+      strcpy(render[2], "up/down");
+    }
+    else if (value < 107)
+    {
+      strcpy(render[2], "down/up");
+    }
+    else
+    {
+      strcpy(render[2], "random");
     }
   }
   else
