@@ -338,7 +338,7 @@ void handleControlChange(byte channel, byte cc, byte value)
   }
   else if (cc == 10 && channel == 7)
   {
-    if (value < 21>)
+    if (value<21>)
     {
       strcpy(render[2], "manual");
     }
@@ -362,6 +362,10 @@ void handleControlChange(byte channel, byte cc, byte value)
     {
       strcpy(render[2], "random");
     }
+  }
+  else if (cc == 11 && channel == 7)
+  {
+    snprintf(render[2], RENDER_SIZE, "%d", (int)(value / 21) + 1);
   }
   else
   {
