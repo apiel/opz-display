@@ -338,7 +338,7 @@ void handleControlChange(byte channel, byte cc, byte value)
   }
   else if (cc == 10 && channel == 7)
   {
-    if (value<21>)
+    if (value < 21)
     {
       strcpy(render[2], "manual");
     }
