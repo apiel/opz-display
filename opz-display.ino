@@ -331,7 +331,7 @@ void handleControlChange(byte channel, byte cc, byte value)
     {
       strcpy(render[2], "Off");
     }
-    else if (value < 16)
+    else
     {
       snprintf(render[2], RENDER_SIZE, "%d", (int)(value / 16) + 1);
     }
