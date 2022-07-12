@@ -75,7 +75,7 @@ void loop(void)
   draw();
 }
 
-void handleControlChange(byte channel, byte number, byte value)
+void handleControlChange(byte channel, byte cc, byte value)
 {
   switch (channel)
   {
@@ -115,7 +115,7 @@ void handleControlChange(byte channel, byte number, byte value)
     break;
   }
 
-  switch (number)
+  switch (cc)
   {
   case 1:
     strcpy(render[1], "P1");
@@ -150,22 +150,22 @@ void handleControlChange(byte channel, byte number, byte value)
     break;
 
   case 9:
-    strcpy(render[1], channel == 7 ? "ARP speed" :"LFO Depth");
+    strcpy(render[1], channel == 7 ? "ARP speed" : "LFO Depth");
     break;
 
   case 10:
-    strcpy(render[1], channel == 7 ? "ARP Pattern" :"LFO Rate");
+    strcpy(render[1], channel == 7 ? "ARP Pattern" : "LFO Rate");
     break;
 
   case 11:
-    strcpy(render[1], channel == 7 ? "ARP Style" :"LFO Dest");
+    strcpy(render[1], channel == 7 ? "ARP Style" : "LFO Dest");
     break;
 
   case 12:
-    strcpy(render[1], channel == 7 ? "ARP Range" :"LFO Shape");
+    strcpy(render[1], channel == 7 ? "ARP Range" : "LFO Shape");
     break;
 
-      case 13:
+  case 13:
     strcpy(render[1], "FX Send 1");
     break;
 
@@ -184,5 +184,37 @@ void handleControlChange(byte channel, byte number, byte value)
   default:
     break;
   }
-  snprintf(render[2], RENDER_SIZE, "%d", value);
+
+  if (cc == 12 && channel != 7)
+  {
+    if (value < 10) {
+      strcpy(render[2], "SIN");
+    } else if (value < 21) {
+      strcpy(render[2], "TRI");
+    } else if (value < 32) {
+      strcpy(render[2], "SSQR");
+    } else if (value < 43) {
+      strcpy(render[2], "SAW");
+    }else if (value < 54) {
+      strcpy(render[2], "RND");
+    }else if (value < 64) {
+      strcpy(render[2], "GYRO");
+    }else if (value < 75) {
+      strcpy(render[2], "SIN triggered");
+    }else if (value < 85) {
+      strcpy(render[2], "TRI triggered");
+    }else if (value < 96) {
+      strcpy(render[2], "SSQR triggered");
+    }else if (value < 107) {
+      strcpy(render[2], "SAW triggered");
+    }else if (value < 118) {
+      strcpy(render[2], "RND triggered");
+    } else {
+      strcpy(render[2], "ONCE triggered");
+    }
+  }
+  else
+  {
+    snprintf(render[2], RENDER_SIZE, "%d", value);
+  }
 }
