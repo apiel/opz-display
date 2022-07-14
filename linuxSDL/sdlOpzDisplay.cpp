@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
-#include "rtmidi/RtMidi.h"
 
 #include <stdio.h>
 
@@ -11,14 +10,13 @@
 #include "color.h"
 #include "font.h"
 
+#include "midi_interface.h" // Must be before opzDisplay.h
+
 // #include "../opzDevice.h"
 #include "../opzDisplay.h"
 
 #define SCREEN_WIDTH 340
 #define SCREEN_HEIGHT 160
-
-RtMidiIn *m_in;
-RtMidiOut *m_out;
 
 double m_last_heartbeat;
 double m_last_time;
@@ -155,7 +153,7 @@ bool midiConnect()
 
                     m_out = new RtMidiOut(RtMidi::Api(0), "opz_dump");
                     m_out->openPort(i, name);
-                    // m_out->sendMessage(opz_init_msg()); // opzInitMsg
+                    midiInitSysExOpz();
 
                     m_connected = true;
                     return true;

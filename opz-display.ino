@@ -61,14 +61,21 @@ void setup(void)
 
   MIDI.begin(MIDI_CHANNEL_OMNI);
 
-  MIDI.setHandleControlChange(handleControlChange);
-  MIDI.setHandleStart(handleMidiStart);
-
   Serial.begin(115200);
+
+  Serial.println("OPZ Display");
+
+  MIDI.setHandleControlChange(handleControlChange);
+  MIDI.setHandleSystemExclusive(handleSysEx);
 
   // wait until device mounted
   while (!TinyUSBDevice.mounted())
     delay(1);
+
+  midiInitSysExOpz();
+
+  byte inArray[4] = {0x7E, 0x7F, 0x06, 0x01};
+  MIDI.sendSysEx(4, &inArray[0]);
 }
 
 void loop(void)

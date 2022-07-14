@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "midi_interface.h"
+
 #ifndef LOG
 #define LOG(...) printf(__VA_ARGS__)
 #endif
@@ -38,13 +40,21 @@ public:
 
 OpzDisplay display;
 
-void handleMidiStart()
+void midiInitSysExOpz()
 {
     LOG("Starting MIDI\n");
+    uint8_t inArray[4] = {0x7E, 0x7F, 0x06, 0x01};
+    sendSysEx(inArray, 4);
+}
+
+void handleSysEx(uint8_t * array, uint16_t size)
+{
+    LOG("SysEx (%d): %s\n", size, array);
 }
 
 void handleControlChange(uint8_t channel, uint8_t cc, uint8_t value)
 {
+    // LOG("CC %d: %d\n", cc, value);
     switch (channel)
     {
     case 1:
