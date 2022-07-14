@@ -55,7 +55,7 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
 
     if (command == SYSEX_HEAD)
     {
-        SDL_Log("SYSEX_HEAD");
+        // SDL_Log("SYSEX_HEAD");
         memcpy(data, _message->data() + 1, _message->size() - 2);
         handleSysEx(&data[0], _message->size() - 2);
         return;
@@ -231,8 +231,14 @@ int main(int argc, char *args[])
     midiConnect();
 
     display.set((char *)"Connect OPZ", (char *)"OP-Z", (char *)"Display");
+    unsigned int lastTime = 0;
     while (handleEvent())
     {
+        if (SDL_GetTicks() - lastTime > 1000)
+        {
+            lastTime = SDL_GetTicks();
+            sendHeartBeat();
+        }
         render(screenSurface);
         SDL_UpdateWindowSurface(window);
         SDL_Delay(100); // ?
