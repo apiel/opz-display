@@ -65,8 +65,8 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
         SDL_Log("%d", command);
     }
 
-    unsigned char status = 0;
-    unsigned char channel = 0;
+    uint8_t status = 0;
+    uint8_t channel = 0;
     if ((command & 0xf0) != 0xf0)
     {
         channel = command & 0x0f;
@@ -83,6 +83,7 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
     {
     case CONTROLLER_CHANGE:
         SDL_Log("CONTROLLER_CHANGE");
+        handleControlChange(channel, _message->at(1), _message->at(2));
         break;
 
     default:
