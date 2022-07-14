@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
-
 #include <stdio.h>
 
 // #include <time.h>
@@ -52,10 +51,13 @@ enum midi_id
 void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message, void *_userData)
 {
     uint8_t command = _message->at(0);
+    uint8_t data[1024];
 
     if (command == SYSEX_HEAD)
     {
         SDL_Log("SYSEX_HEAD");
+        memcpy(data, _message->data() + 1, _message->size() - 2);
+        handleSysEx(&data[0], _message->size() - 2);
         return;
     }
     if (command != TIMING_TICK)
