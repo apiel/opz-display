@@ -14,6 +14,8 @@ U8G2_SSD1306_72X40_ER_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE); // EastR
 #include <Adafruit_TinyUSB.h>
 #include <MIDI.h>
 
+#define LOG(...) Serial.printf(__VA_ARGS__)
+
 #include "opzDisplay.h"
 
 // USB MIDI object
@@ -60,6 +62,7 @@ void setup(void)
   MIDI.begin(MIDI_CHANNEL_OMNI);
 
   MIDI.setHandleControlChange(handleControlChange);
+  MIDI.setHandleStart(handleMidiStart);
 
   Serial.begin(115200);
 

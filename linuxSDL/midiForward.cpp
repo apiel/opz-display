@@ -9,7 +9,6 @@ void midiDisconnect()
 {
     if (m_in)
     {
-        m_in->cancelCallback();
         m_in->closePort();
         delete m_in;
         m_in = NULL;
@@ -35,22 +34,25 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
 
 bool midiConnect()
 {
+    bool in_connected = false;
 
     m_in = new RtMidiIn();
     unsigned int nPorts = m_in->getPortCount();
-    bool in_connected = false;
+
+    m_out = new RtMidiOut();
+    nPorts = m_out->getPortCount();
+
     for (unsigned int i = 0; i < nPorts; i++)
     {
-        std::string name = m_in->getPortName(i);
-        if (name.rfind("OP-Z", 0) == 0)
+        std::string name = m_out->getPortName(i);
+        if (name.rfind("Pico", 0) == 0)
         {
-            printf("Found OP-Z MIDI input port: %s\n", name.c_str());
+            printf("Found Pico MIDI output port: %s\n", name.c_str());
             try
             {
-                m_in = new RtMidiIn(RtMidi::Api(0), "opz_dump");
-                m_in->openPort(i, name);
-                m_in->ignoreTypes(false, false, true);
-                m_in->setCallback(midiProcessMessage, NULL);
+                m_out = new RtMidiOut(RtMidi::Api(0), "opz_dump");
+                m_out->openPort(i, name);
+                // m_out->sendMessage(opz_init_msg()); // opzInitMsg
                 in_connected = true;
                 break;
             }
@@ -63,20 +65,18 @@ bool midiConnect()
 
     if (in_connected)
     {
-        m_out = new RtMidiOut();
-        nPorts = m_out->getPortCount();
         for (unsigned int i = 0; i < nPorts; i++)
         {
-            std::string name = m_out->getPortName(i);
-            if (name.rfind("Pico", 0) == 0)
+            std::string name = m_in->getPortName(i);
+            if (name.rfind("OP-Z", 0) == 0)
             {
-                printf("Found Pico MIDI output port: %s\n", name.c_str());
+                printf("Found OP-Z MIDI input port: %s\n", name.c_str());
                 try
                 {
-                    m_out = new RtMidiOut(RtMidi::Api(0), "opz_dump");
-                    m_out->openPort(i, name);
-                    // m_out->sendMessage(opz_init_msg()); // opzInitMsg
-
+                    m_in = new RtMidiIn(RtMidi::Api(0), "opz_dump");
+                    m_in->openPort(i, name);
+                    m_in->ignoreTypes(false, false, true);
+                    m_in->setCallback(midiProcessMessage, NULL);
                     return true;
                 }
                 catch (RtMidiError &error)
@@ -100,5 +100,6 @@ int main(int argc, char *args[])
     printf("\nReading MIDI input ... press <enter> to quit.\n");
     char input;
     std::cin.get(input);
+    midiDisconnect();
     return 0;
 }

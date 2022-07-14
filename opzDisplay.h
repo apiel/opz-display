@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef LOG
+#define LOG(...) printf(__VA_ARGS__)
+#endif
+
 #define RENDER_SIZE 100
 #define LINE_COUNT 3
 
@@ -33,6 +37,11 @@ public:
 };
 
 OpzDisplay display;
+
+void handleMidiStart()
+{
+    LOG("Starting MIDI\n");
+}
 
 void handleControlChange(uint8_t channel, uint8_t cc, uint8_t value)
 {

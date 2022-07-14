@@ -8,7 +8,7 @@ forward:
 	g++ -o midiForward -Wall  midiForward.cpp rtmidi/RtMidi.cpp -D__LINUX_ALSA__ -lasound -lpthread
 
 build:
-	$(CC) -Wall  opzDisplay.cpp rtmidi/RtMidi.cpp -fopenmp -Wno-narrowing `$(SDL_CONFIG) --cflags --libs` -D__LINUX_ALSA__ -lasound -lpthread
+	$(CC) -Wall  sdlOpzDisplay.cpp rtmidi/RtMidi.cpp -fopenmp -Wno-narrowing `$(SDL_CONFIG) --cflags --libs` -D__LINUX_ALSA__ -lasound -lpthread
 
 run:
 	./opzDisplay
