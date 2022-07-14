@@ -29,14 +29,15 @@ void draw()
   {
     lastDraw = millis();
     u8g2.clearBuffer();
-    u8g2.setFont(u8g2_font_7x14_tf);
     u8g2.setFontRefHeightExtendedText();
     u8g2.setDrawColor(1);
     u8g2.setFontPosTop();
     u8g2.setFontDirection(0);
+    u8g2.setFont(u8g2_font_5x8_tf);
     u8g2.drawStr(0, 0, render[0]);
-    u8g2.drawStr(0, 14, render[1]);
-    u8g2.drawStr(0, 28, render[2]);
+    u8g2.setFont(u8g2_font_7x14_tf);
+    u8g2.drawStr(0, 10, render[1]);
+    u8g2.drawStr(0, 24, render[2]);
     u8g2.sendBuffer();
   }
 }
@@ -48,8 +49,9 @@ void setup(void)
   Wire.begin();
   u8g2.begin();
 
-  strcpy(render[0], "OP-Z screen");
-  strcpy(render[1], "v0.0.1");
+  strcpy(render[0], "Connect to OPZ");
+  strcpy(render[1], "OP-Z");
+  strcpy(render[2], "Display");
 
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
   // Manual begin() is required on core without built-in support for TinyUSB such as mbed rp2040
