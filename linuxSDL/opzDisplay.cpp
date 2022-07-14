@@ -1,13 +1,174 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
+#include "rtmidi/RtMidi.h"
+
 #include <stdio.h>
+
+// #include <time.h>
+// #include <sys/time.h>
 
 #include "color.h"
 #include "font.h"
 
+// #include "../opzDevice.h"
+
 #define SCREEN_WIDTH 340
 #define SCREEN_HEIGHT 160
+
+RtMidiIn *m_in;
+RtMidiOut *m_out;
+
+double m_last_heartbeat;
+double m_last_time;
+double m_last_step;
+
+bool m_connected;
+
+timespec time_start;
+
+// Standard MIDI events
+enum midi_id
+{
+    NOTE_OFF = 0x80,
+    NOTE_ON = 0x90,
+    KEY_PRESSURE = 0xA0,
+    CONTROLLER_CHANGE = 0xB0,
+    PROGRAM_CHANGE = 0xC0,
+    CHANNEL_PRESSURE = 0xD0,
+    PITCH_BEND = 0xE0,
+    SYSEX_HEAD = 0xF0,
+    SONG_POSITION = 0xF2,
+    SONG_SELECT = 0xF3,
+    TUNE_REQUEST = 0xF6,
+    SYSEX_END = 0xF7,
+    TIMING_TICK = 0xF8,
+    START_SONG = 0xFA,
+    CONTINUE_SONG = 0xFB,
+    STOP_SONG = 0xFC,
+    ACTIVE_SENSING = 0xFE,
+    SYSTEM_RESET = 0xFF
+};
+
+void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message, void *_userData)
+{
+    uint8_t command = _message->at(0);
+
+    if (command == SYSEX_HEAD)
+    {
+        SDL_Log("SYSEX_HEAD");
+        return;
+    }
+    if (command != TIMING_TICK)
+    {
+        SDL_Log("%d %d", command);
+    }
+
+    unsigned char status = 0;
+    unsigned char channel = 0;
+    if ((command & 0xf0) != 0xf0)
+    {
+        channel = command & 0x0f;
+        channel += 1;
+        status = command & 0xf0;
+    }
+    else
+    {
+        channel = 0;
+        status = command;
+    }
+
+    switch (status)
+    {
+    case CONTROLLER_CHANGE:
+        SDL_Log("CONTROLLER_CHANGE");
+        break;
+
+    default:
+        break;
+    }
+}
+
+void midiDisconnect()
+{
+    if (m_in)
+    {
+        m_in->cancelCallback();
+        m_in->closePort();
+        delete m_in;
+        m_in = NULL;
+    }
+
+    if (m_out)
+    {
+        m_out->closePort();
+        delete m_out;
+        m_out = NULL;
+    }
+
+    m_connected = false;
+}
+
+bool midiConnect()
+{
+
+    m_in = new RtMidiIn();
+    unsigned int nPorts = m_in->getPortCount();
+    bool in_connected = false;
+    for (unsigned int i = 0; i < nPorts; i++)
+    {
+        std::string name = m_in->getPortName(i);
+        if (name.rfind("OP-Z", 0) == 0)
+        {
+            SDL_Log("Found OP-Z MIDI input port: %s", name.c_str());
+            try
+            {
+                m_in = new RtMidiIn(RtMidi::Api(0), "opz_dump");
+                m_in->openPort(i, name);
+                m_in->ignoreTypes(false, false, true);
+                m_in->setCallback(midiProcessMessage, NULL);
+                in_connected = true;
+                break;
+            }
+            catch (RtMidiError &error)
+            {
+                error.printMessage();
+            }
+        }
+    }
+
+    if (in_connected)
+    {
+        m_out = new RtMidiOut();
+        nPorts = m_out->getPortCount();
+        for (unsigned int i = 0; i < nPorts; i++)
+        {
+            std::string name = m_out->getPortName(i);
+            if (name.rfind("OP-Z", 0) == 0)
+            {
+                SDL_Log("Found OP-Z MIDI output port: %s", name.c_str());
+                try
+                {
+                    clock_gettime(CLOCK_MONOTONIC, &time_start);
+
+                    m_out = new RtMidiOut(RtMidi::Api(0), "opz_dump");
+                    m_out->openPort(i, name);
+                    // m_out->sendMessage(opz_init_msg()); // opzInitMsg
+
+                    m_connected = true;
+                    return true;
+                }
+                catch (RtMidiError &error)
+                {
+                    error.printMessage();
+                }
+            }
+        }
+    }
+
+    midiDisconnect();
+    return false;
+}
 
 bool handleEvent()
 {
@@ -65,8 +226,10 @@ int main(int argc, char *args[])
     }
     SDL_Surface *screenSurface = SDL_GetWindowSurface(window);
 
-    render(screenSurface, (char *)"Connect to OPZ", (char *)"OP-Z", (char *)"display");
+    render(screenSurface, (char *)"Connect OPZ", (char *)"OP-Z", (char *)"display");
     SDL_UpdateWindowSurface(window);
+
+    midiConnect();
 
     while (handleEvent())
     {

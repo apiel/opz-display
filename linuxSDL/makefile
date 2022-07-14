@@ -5,7 +5,7 @@ CC=g++ -o opzDisplay
 linux: build run
 
 build:
-	$(CC) -Wall  opzDisplay.cpp -fopenmp -Wno-narrowing `$(SDL_CONFIG) --cflags --libs`
+	$(CC) -Wall  opzDisplay.cpp rtmidi/RtMidi.cpp -fopenmp -Wno-narrowing `$(SDL_CONFIG) --cflags --libs` -D__LINUX_ALSA__ -lasound -lpthread
 
 run:
 	./opzDisplay
