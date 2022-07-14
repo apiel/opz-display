@@ -12,6 +12,7 @@
 #include "font.h"
 
 // #include "../opzDevice.h"
+#include "../opzDisplay.h"
 
 #define SCREEN_WIDTH 340
 #define SCREEN_HEIGHT 160
@@ -61,7 +62,7 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
     }
     if (command != TIMING_TICK)
     {
-        SDL_Log("%d %d", command);
+        SDL_Log("%d", command);
     }
 
     unsigned char status = 0;
@@ -194,13 +195,13 @@ bool handleEvent()
     return true;
 }
 
-void render(SDL_Surface *screenSurface, char *line1, char *line2, char *line3)
+void render(SDL_Surface *screenSurface)
 {
     SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, UI_COLOR_BG));
-    SDL_Log("\n%s\n%s\n%s\n", line1, line2, line3);
-    draw_string(screenSurface, line1, 2, 6, 3);
-    draw_string(screenSurface, line2, 2, 50, 4);
-    draw_string(screenSurface, line3, 2, 100, 4);
+    // SDL_Log("\n%s\n%s\n%s\n", display.line[0], display.line[1], display.line[2]);
+    draw_string(screenSurface, display.line[0], 2, 6, 3);
+    draw_string(screenSurface, display.line[1], 2, 50, 4);
+    draw_string(screenSurface, display.line[2], 2, 100, 4);
 }
 
 int main(int argc, char *args[])
@@ -226,16 +227,14 @@ int main(int argc, char *args[])
     }
     SDL_Surface *screenSurface = SDL_GetWindowSurface(window);
 
-    render(screenSurface, (char *)"Connect OPZ", (char *)"OP-Z", (char *)"display");
-    SDL_UpdateWindowSurface(window);
-
     midiConnect();
 
+    display.set((char *)"Connect OPZ", (char *)"OP-Z", (char *)"Display");
     while (handleEvent())
     {
-        // render(screenSurface, app.handleUi(ui.keys));
-        // SDL_UpdateWindowSurface(window);
-        SDL_Delay(10); // ?
+        render(screenSurface);
+        SDL_UpdateWindowSurface(window);
+        SDL_Delay(100); // ?
     }
 
     SDL_DestroyWindow(window);
