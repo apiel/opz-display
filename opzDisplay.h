@@ -16,10 +16,23 @@
 
 class OpzDisplay
 {
-public:
-    // char *track = "";
-    // char *encoderMode = "";
+protected:
+    uint8_t track;
+    uint8_t encoderMode;
 
+    void setHeader()
+    {
+        if (track == 6 && encoderMode == 2) // ARP
+        {
+            snprintf(line[0], RENDER_SIZE, "%s ARP", trackName[track]);
+        }
+        else
+        {
+            snprintf(line[0], RENDER_SIZE, "%s %s", trackName[track], encoderModeName[encoderMode]);
+        }
+    }
+
+public:
     char line[LINE_COUNT][RENDER_SIZE];
 
     void set(char *_line1, char *_line2, char *_line3)
@@ -39,17 +52,16 @@ public:
         strncpy(line[linePos % LINE_COUNT], _line, RENDER_SIZE);
     }
 
-    void setHeader(char *_track, char *_encoderMode = NULL)
+    void setTrack(uint8_t _track)
     {
-        // if (_encoderMode != NULL)
-        // {
-        //     encoderMode = _encoderMode;
-        // }
-        // if (_track != NULL)
-        // {
-        //     track = _track;
-        // }
-        // snprintf(line[0], RENDER_SIZE, "%s %s", track, encoderMode);
+        track = _track;
+        setHeader();
+    }
+
+    void setEncoderMode(uint8_t _encoderMode)
+    {
+        encoderMode = _encoderMode;
+        setHeader();
     }
 };
 
@@ -116,7 +128,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
         // printData(data, dataSize, "Keyboard setting");
         // LOG("Keyboard setting: octave %d, track %d %s\n", data[0], data[1], trackName[data[1]]);
-        // display.setHeader(trackName[data[1]]);
+        display.setTrack(data[1]);
         return;
     }
 
@@ -144,16 +156,20 @@ void handleSysEx(uint8_t *array, uint16_t size)
         switch (data[0])
         {
         case 0x00:
-            LOG("Encoder mode: white, sound\n");
+            // LOG("Encoder mode: white, sound\n");
+            display.setEncoderMode(0);
             break;
         case 0x40:
-            LOG("Encoder mode: green, env\n");
+            // LOG("Encoder mode: green, env\n");
+            display.setEncoderMode(1);
             break;
         case 0x80:
-            LOG("Encoder mode: purple, lfo or arp\n");
+            // LOG("Encoder mode: purple, lfo or arp\n");
+            display.setEncoderMode(2);
             break;
         case 0xC0:
-            LOG("Encoder mode: red, fx and level\n");
+            // LOG("Encoder mode: red, fx and level\n");
+            display.setEncoderMode(3);
             break;
 
         default:

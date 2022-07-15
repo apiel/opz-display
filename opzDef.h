@@ -9,7 +9,9 @@
 #define MAX_DATA_SIZE 2048
 
 const char *trackName[16] = {
-    "KICK", "SNARE", "PERC", "SAMPLE", "BASS", "LEAD", "ARP", "CHORD", 
+    "KICK", "SNARE", "PERC", "SAMPLE", "BASS", "LEAD", "ARP", "CHORD",
     "FX1", "FX2", "TAPE", "MASTER", "PERFORM", "MODULE", "LIGHT", "MOTION"};
+
+const char *encoderModeName[4] = {"Sound", "Env.", "LFO", "FX/Level"};
 
 #endif
