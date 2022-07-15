@@ -14,22 +14,59 @@
 #define RENDER_SIZE 100
 #define LINE_COUNT 3
 
+#define SOUND_PARAM_COUNT 16
+
 class OpzDisplay
 {
 protected:
     uint8_t track;
     uint8_t encoderMode;
+    uint8_t soundParam[SOUND_PARAM_COUNT] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t soundParamChanged = 0;
 
-    void setHeader()
+    const char *getTrackName()
     {
-        if (track == 6 && encoderMode == 2) // ARP
+        return trackName[track];
+    }
+
+    const char *getEncoderModeName()
+    {
+        if (track == TRACK_ARP && encoderMode == 2) // ARP
         {
-            snprintf(line[0], RENDER_SIZE, "%s ARP", trackName[track]);
+            return "ARP";
         }
-        else
+        return encoderModeName[encoderMode];
+    }
+
+    const char *getSoundParamName(uint8_t param)
+    {
+        if (track == TRACK_ARP && param > 7 && param < 12) // ARP
         {
-            snprintf(line[0], RENDER_SIZE, "%s %s", trackName[track], encoderModeName[encoderMode]);
+            return soundParamArpName[param - 8];
         }
+        return soundParamName[param];
+    }
+
+    void renderHeader()
+    {
+        snprintf(line[0], RENDER_SIZE, "%s %s", getTrackName(), getEncoderModeName());
+    }
+
+    void renderMain()
+    {
+        renderHeader();
+
+        // TODO render the 4 knob values
+        strcpy(line[1], "");
+        strcpy(line[2], "");
+    }
+
+    void renderSoundParam()
+    {
+        renderHeader();
+        strncpy(line[1], getSoundParamName(soundParamChanged), RENDER_SIZE);
+        // strncpy(line[2], getEncoderModeName(), RENDER_SIZE);
+        snprintf(line[2], RENDER_SIZE, "%d", soundParam[soundParamChanged]);
     }
 
 public:
@@ -52,16 +89,33 @@ public:
         strncpy(line[linePos % LINE_COUNT], _line, RENDER_SIZE);
     }
 
-    void setTrack(uint8_t _track)
+    void setTrack(uint8_t _track, bool render = true)
     {
         track = _track;
-        setHeader();
+        if (render)
+        {
+            renderMain();
+        }
     }
 
     void setEncoderMode(uint8_t _encoderMode)
     {
         encoderMode = _encoderMode;
-        setHeader();
+        renderMain();
+    }
+
+    void setSoundParam(uint8_t *_soundParam)
+    {
+        for (uint8_t i = 0; i < SOUND_PARAM_COUNT; i++)
+        {
+            printf("%d == %d\n", soundParam[i], _soundParam[i]);
+            if (soundParam[i] != _soundParam[i])
+            {
+                soundParam[i] = _soundParam[i];
+                soundParamChanged = i;
+            }
+        }
+        renderSoundParam();
     }
 };
 
@@ -129,6 +183,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
         // printData(data, dataSize, "Keyboard setting");
         // LOG("Keyboard setting: octave %d, track %d %s\n", data[0], data[1], trackName[data[1]]);
         display.setTrack(data[1]);
+
         return;
     }
 
@@ -196,6 +251,37 @@ void handleSysEx(uint8_t *array, uint16_t size)
         uint8_t msg[8] = {0x09, 0x00, 0x00, data[1], data[2], data[3], data[4], 0x00};
         uint16_t len = encode(&msg[0], 8, &output[5]);
         sendSysEx(&output[0], len + 5);
+        return;
+    }
+
+    if (parm_id == 0x0e)
+    {
+        // Sound preset https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#0e-sound-preset
+        // F0 00 20 76 01 0E 20 05 02 00 75 53 61 0D 10 2A 2B 31 39 25 73 00 13 6B 20 1B 68 00 7F
+
+        // Byte	Function
+        // 8	Selected track number
+        // 9	Engine parameter 1
+        // 10	Engine parameter 2
+        // 11	Attack
+        // 12	Decay
+        // 13	Sustain
+        // 14	Release
+        // 15	FX Send level 1
+        // 16	FX Send level 2
+        // 18	Filter
+        // 19	Resonance
+        // 20	Pan
+        // 21	Level
+        // 22	Portamendo
+        // 24	LFO Depth / Arp Speed
+        // 25	LFO Speed / Arp Pattern
+        // 26	LFO Value / Arp Style
+        // 27	LFO Shape / Arp Range
+
+        printData(data, dataSize, "Sound preset");
+        display.setTrack(data[0], false);
+        display.setSoundParam(data + 1);
         return;
     }
 }
