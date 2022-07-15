@@ -15,6 +15,12 @@ void printData(uint8_t *data, int size, const char *label = "Data")
     LOG("\n\n");
 }
 
+const char * getItem(uint8_t value, const char ** list, uint8_t size)
+{
+    uint8_t val = (float)value / 255.0f * (float)size;
+    return list[val >= size ? size - 1 : val];
+}
+
 uint16_t encode(const unsigned char *inData, unsigned inLength, unsigned char *outSysEx, bool inFlipHeaderBits = true)
 {
     uint16_t outLength = 0;  // Num bytes in output array.

@@ -16,7 +16,44 @@ const char *trackName[16] = {
 
 const char *encoderModeName[4] = {"Sound", "Env.", "LFO", "FX/Level"};
 
-#define SOUND_PARAM_COUNT 18
+#define LFO_SHAPE_COUNT 12
+const char *lfoShapeName[LFO_SHAPE_COUNT] = {
+    "SINE",
+    "TRIANGLE",
+    "SQUARE",
+    "SAW",
+    "RANDOM",
+    "GYRO",
+    "SIN triggered",
+    "TRI triggered",
+    "SQR triggered",
+    "SAW triggered",
+    "RND triggered",
+    "ONCE triggered",
+};
+
+enum
+{
+    SOUND_PARAM_P1,
+    SOUND_PARAM_P2,
+    SOUND_PARAM_ATTACK,
+    SOUND_PARAM_DECAY,
+    SOUND_PARAM_SUBSTAIN,
+    SOUND_PARAM_RELEASE,
+    SOUND_PARAM_FX1,
+    SOUND_PARAM_FX2,
+    SOUND_PARAM_CUTOFF,
+    SOUND_PARAM_RES,
+    SOUND_PARAM_PAN,
+    SOUND_PARAM_LEVEL,
+    SOUND_PARAM_PORTAMENTO,
+    SOUND_PARAM_LFO_DEPTH_OR_ARP_SPEED,
+    SOUND_PARAM_LFO_RATE_OR_ARP_PATTERN,
+    SOUND_PARAM_LFO_DEST_OR_ARP_STYLE,
+    SOUND_PARAM_LFO_SHAPE_OR_ARP_RANGE,
+    SOUND_PARAM_TBD,
+    SOUND_PARAM_COUNT
+};
 
 const char *soundParamName[SOUND_PARAM_COUNT] = {
     "P1",

@@ -64,7 +64,20 @@ protected:
         renderHeader();
         strncpy(line[1], getSoundParamName(soundParamChanged), RENDER_SIZE);
         // strncpy(line[2], getEncoderModeName(), RENDER_SIZE);
-        snprintf(line[2], RENDER_SIZE, "%d", soundParam[soundParamChanged]);
+
+        uint8_t value = soundParam[soundParamChanged];
+        if (track != TRACK_ARP)
+        {
+            switch (soundParamChanged)
+            {
+            case SOUND_PARAM_LFO_SHAPE_OR_ARP_RANGE:
+                strncpy(line[2], getItem(value, &lfoShapeName[0], LFO_SHAPE_COUNT), RENDER_SIZE);
+                return;
+            default:
+                break;
+            }
+        }
+        snprintf(line[2], RENDER_SIZE, "%d", value);
     }
 
 public:
