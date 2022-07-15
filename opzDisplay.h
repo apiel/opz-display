@@ -68,15 +68,6 @@ void handleSysEx(uint8_t *array, uint16_t size)
     // }
     // printf("\n");
 
-    // typedef struct
-    // {
-    //     uint8_t vendor_id[3];
-    //     uint8_t protocol_version;
-    //     uint8_t parm_id;
-    // } opz_sysex_header;
-    // opz_sysex_header header;
-    // memcpy(&header, array, sizeof(opz_sysex_header));
-
     if (array[0] != OPZ_VENDOR_ID[0] || array[1] != OPZ_VENDOR_ID[1] || array[2] != OPZ_VENDOR_ID[2])
     {
         LOG("Vendor ID %02X:%02X:%02X is not the expected ID %02X:%02X:%02X\n", array[0], array[1], array[2], OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2]);
@@ -91,6 +82,10 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
     uint8_t parm_id = array[4];
 
+    if (parm_id == 0x01) {
+        return;
+    }
+
     uint8_t output[MAX_DATA_SIZE];
     uint8_t data[MAX_DATA_SIZE];
     decode(array + 5, size, data);
@@ -98,8 +93,6 @@ void handleSysEx(uint8_t *array, uint16_t size)
     LOG("parm_id %02X (%d)\n", parm_id, parm_id);
     if (parm_id == 0x09)
     {
-        LOG("got 0x09\n");
-
         memcpy(&output, array, 4);
         output[4] = 0x0B;
         uint8_t msg[8] = {0x09, 0x00, 0x00, data[1], data[2], data[3], data[4], 0x00};
