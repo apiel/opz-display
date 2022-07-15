@@ -82,7 +82,12 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
     uint8_t parm_id = array[4];
 
-    if (parm_id == 0x01) {
+    if (parm_id == 0x01)
+    {
+        // https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#01-universal-response
+        // F0 00 20 76 01 01 0C 15 55 2D 0E F7
+        //
+        // Sent by OP-Z every time a 00 message is received. Significance currently unknown. Bytes 10/11 match bytes 8/9 of 00 message, but with 8th bit cleared if it was set.
         return;
     }
 
@@ -93,6 +98,17 @@ void handleSysEx(uint8_t *array, uint16_t size)
     LOG("parm_id %02X (%d)\n", parm_id, parm_id);
     if (parm_id == 0x09)
     {
+        // Pattern ( https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#09-pattern )
+        // F0 00 20 76 01 09 00 0A 00 36 00 00 00 78 57 1C 6D 5D 6D 0C 54 57 6E 7D 47 71 7F 3E 41 30 1E 04 42 2E
+        // 40 29 61 31 40 6B 58 2F 06 1C 0C 54 59 6B 05 32 5D 5D 09 46 1E 36 06 60 5A 48 4E 62 4A 3B 72 26 45 31
+        // 2F 12 79 62 35 09 42 6A 16 3B 12 60 5C 64 5D 12 0A 6C 05 2B 45 16 25 02 4A 79 1E 53 29 35 09 04 10 2F
+        // 3F 4C 0B 36 72 0B 64 4D 1C 55 59 15 7C 22 72 54 75 54 46 15 25 10 52 0A 3D 26 35 27 77 5C 27 39 73 73
+        // 30 3B 77 1E 76 1E 37 3B 73 3D 12 7A 1D 3D 5D 77 7E 66 1E 39 67 6F 2B 5C 19 1D 5D 3F 27 45 38 64 59 57
+        // 1B 48 3D 59 75 79 49 58 1E 7B 0A 1C 53 0A 5A 59 79 43 68 2F 1A 74 5B 5F 68 6A 5C 2B 3B 5F 58 20 5F 09
+        // 7A 73 76 5E 3F 5B 56 5A 2E 09 03 7A 07 F7
+        //
+        // Code indicates that this may be the data for a full pattern, compressed using zlib and sent in packets.
+
         memcpy(&output, array, 4);
         output[4] = 0x0B;
         uint8_t msg[8] = {0x09, 0x00, 0x00, data[1], data[2], data[3], data[4], 0x00};
