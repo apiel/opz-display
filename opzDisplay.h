@@ -14,14 +14,12 @@
 #define RENDER_SIZE 100
 #define LINE_COUNT 3
 
-#define SOUND_PARAM_COUNT 16
-
 class OpzDisplay
 {
 protected:
     uint8_t track;
     uint8_t encoderMode;
-    uint8_t soundParam[SOUND_PARAM_COUNT] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t soundParam[SOUND_PARAM_COUNT] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t soundParamChanged = 0;
 
     const char *getTrackName()
@@ -40,9 +38,9 @@ protected:
 
     const char *getSoundParamName(uint8_t param)
     {
-        if (track == TRACK_ARP && param > 7 && param < 12) // ARP
+        if (track == TRACK_ARP && param > 12) // ARP
         {
-            return soundParamArpName[param - 8];
+            return soundParamArpName[param - 13];
         }
         return soundParamName[param];
     }
@@ -108,7 +106,7 @@ public:
     {
         for (uint8_t i = 0; i < SOUND_PARAM_COUNT; i++)
         {
-            printf("%d == %d\n", soundParam[i], _soundParam[i]);
+            // printf("%d == %d\n", soundParam[i], _soundParam[i]);
             if (soundParam[i] != _soundParam[i])
             {
                 soundParam[i] = _soundParam[i];

@@ -16,42 +16,27 @@ const char *trackName[16] = {
 
 const char *encoderModeName[4] = {"Sound", "Env.", "LFO", "FX/Level"};
 
-// FIXME
-        // 8	Selected track number
-        // 9	Engine parameter 1
-        // 10	Engine parameter 2
-        // 11	Attack
-        // 12	Decay
-        // 13	Sustain
-        // 14	Release
-        // 15	FX Send level 1
-        // 16	FX Send level 2
-        // 18	Filter
-        // 19	Resonance
-        // 20	Pan
-        // 21	Level
-        // 22	Portamendo
-        // 24	LFO Depth / Arp Speed
-        // 25	LFO Speed / Arp Pattern
-        // 26	LFO Value / Arp Style
-        // 27	LFO Shape / Arp Range
-const char *soundParamName[16] = {
+#define SOUND_PARAM_COUNT 18
+
+const char *soundParamName[SOUND_PARAM_COUNT] = {
     "P1",
     "P2",
-    "Cutoff",
-    "Res",
     "Attack",
     "Decay",
     "Substain",
     "Release",
+    "FX Send 1",
+    "FX Send 2",
+    "Cutoff",
+    "Res",
+    "Pan",
+    "Level",
+    "Portamento",
     "LFO Depth",
     "LFO Rate",
     "LFO Dest",
     "LFO Shape",
-    "FX Send 1",
-    "FX Send 2",
-    "Pan",
-    "Level",
+    "TBD.",
 };
 
 const char *soundParamArpName[4] = {"Speed", "Pattern", "Style", "Range"};
