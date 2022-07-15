@@ -7,6 +7,8 @@
 #include <stdlib.h>
 
 #include "midi_interface.h"
+#include "opzMidi.h"
+#include "opzDataUtil.h"
 
 #ifndef LOG
 #define LOG(...) printf(__VA_ARGS__)
@@ -40,18 +42,6 @@ public:
 
 OpzDisplay display;
 
-const uint8_t OPZ_INIT[4] = {0x7E, 0x7F, 0x06, 0x01};
-const uint8_t OPZ_INIT_RESPONSE[4] = {0x7E, 0x7F, 0x06, 0x02};
-const uint8_t OPZ_VENDOR_ID[3] = {0x00, 0x20, 0x76};
-const uint8_t OPZ_MAX_PROTOCOL_VERSION = 0x01;
-const uint8_t OPZ_HEARTBEAT[9] = {
-    // OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2], OPZ_MAX_PROTOCOL_VERSION, 0x00, 0x03, 0x2D, 0x0E, 0x05 // prior to version 1.2.5
-    OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2], OPZ_MAX_PROTOCOL_VERSION, 0x00, 0x01, 0x4E, 0x2E, 0x06 // version 1.2.5
-    // OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2], OPZ_MAX_PROTOCOL_VERSION, 0x00, 0x01, 0x7F, 0x75, 0x06 // new version
-    // OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2], OPZ_MAX_PROTOCOL_VERSION, 0x00, 0x00, 0x2C, 0x54, 0x06 //
-    // OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2], OPZ_MAX_PROTOCOL_VERSION, 0x00, 0x02, 0x27, 0x3C, 0x06
-};
-
 void midiInitSysExOpz()
 {
     LOG("Starting MIDI\n");
@@ -62,14 +52,6 @@ void sendHeartBeat()
 {
     sendSysEx((uint8_t *)OPZ_HEARTBEAT, 9);
 }
-
-typedef struct
-{
-    // uint8_t sysex_id[4];
-    uint8_t vendor_id[3];
-    uint8_t protocol_version;
-    uint8_t parm_id;
-} opz_sysex_header;
 
 void handleSysEx(uint8_t *array, uint16_t size)
 {
@@ -86,36 +68,44 @@ void handleSysEx(uint8_t *array, uint16_t size)
     // }
     // printf("\n");
 
-    opz_sysex_header header;
-    memcpy(&header, array, sizeof(opz_sysex_header));
+    // typedef struct
+    // {
+    //     uint8_t vendor_id[3];
+    //     uint8_t protocol_version;
+    //     uint8_t parm_id;
+    // } opz_sysex_header;
+    // opz_sysex_header header;
+    // memcpy(&header, array, sizeof(opz_sysex_header));
 
-    if ((header.protocol_version == 0) || (header.protocol_version > OPZ_MAX_PROTOCOL_VERSION))
+    if (array[0] != OPZ_VENDOR_ID[0] || array[1] != OPZ_VENDOR_ID[1] || array[2] != OPZ_VENDOR_ID[2])
     {
-        LOG("Unexpected protocol version %02X, was expecting > 0 and <= %02X\n", header.protocol_version, OPZ_MAX_PROTOCOL_VERSION);
+        LOG("Vendor ID %02X:%02X:%02X is not the expected ID %02X:%02X:%02X\n", array[0], array[1], array[2], OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2]);
         return;
     }
 
-    if (memcmp(OPZ_VENDOR_ID, header.vendor_id, sizeof(OPZ_VENDOR_ID)) != 0)
+    if ((array[3] == 0) || (array[3] > OPZ_MAX_PROTOCOL_VERSION))
     {
-        LOG("Vendor ID %02X:%02X:%02X is not the expected ID %02X:%02X:%02X\n", header.vendor_id[0], header.vendor_id[1], header.vendor_id[2], OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2]);
+        LOG("Unexpected protocol version %02X, was expecting > 0 and <= %02X\n", array[3], OPZ_MAX_PROTOCOL_VERSION);
         return;
     }
 
-    uint8_t *data = array + sizeof(opz_sysex_header);
-    // LOG("parm_id %02X or %d\n", header.parm_id, header.parm_id);
-    if (header.parm_id == 0x09)
+    uint8_t parm_id = array[4];
+
+    uint8_t output[MAX_DATA_SIZE];
+    uint8_t data[MAX_DATA_SIZE];
+    decode(array + 5, size, data);
+
+    LOG("parm_id %02X (%d)\n", parm_id, parm_id);
+    if (parm_id == 0x09)
     {
         LOG("got 0x09\n");
 
-    // std::vector<unsigned char> msg = {  0x09, 0x00, 0x00, data[1], data[2], data[3], data[4], 0x00  };
-    // std::vector<unsigned char> sysex_out = { OPZ_VENDOR_ID[0], OPZ_VENDOR_ID[1], OPZ_VENDOR_ID[2], OPZ_MAX_PROTOCOL_VERSION, 0x0B };
-    // sysex_out.resize(100);
-    // size_t outdata_length = T3::encode(&msg[0], msg.size(), &sysex_out[6]);
-    // sysex_out.resize(6 + outdata_length);
-    // return sysex_out;
-
-
-        // sendSysEx()
+        memcpy(&output, array, 4);
+        output[4] = 0x0B;
+        uint8_t msg[8] = {0x09, 0x00, 0x00, data[1], data[2], data[3], data[4], 0x00};
+        uint16_t len = encode(&msg[0], 8, &output[5]);
+        printf("len %d\n", len);
+        sendSysEx(&output[0], len + 5);
     }
 }
 

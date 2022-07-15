@@ -13,6 +13,7 @@
 
 // #include "../opzDevice.h"
 #include "../opzDisplay.h"
+#include "../opzDataUtil.h"
 
 #define SCREEN_WIDTH 340
 #define SCREEN_HEIGHT 160
@@ -51,7 +52,7 @@ enum midi_id
 void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message, void *_userData)
 {
     uint8_t command = _message->at(0);
-    uint8_t data[1024];
+    uint8_t data[MAX_DATA_SIZE];
 
     if (command == SYSEX_HEAD)
     {
