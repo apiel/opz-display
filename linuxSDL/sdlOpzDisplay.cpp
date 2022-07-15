@@ -13,7 +13,7 @@
 
 // #include "../opzDevice.h"
 #include "../opzDisplay.h"
-#include "../opzDataUtil.h"
+#include "../opzDef.h"
 
 #define SCREEN_WIDTH 340
 #define SCREEN_HEIGHT 160

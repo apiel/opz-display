@@ -9,10 +9,7 @@
 #include "midi_interface.h"
 #include "opzMidi.h"
 #include "opzDataUtil.h"
-
-#ifndef LOG
-#define LOG(...) printf(__VA_ARGS__)
-#endif
+#include "opzDef.h"
 
 #define RENDER_SIZE 100
 #define LINE_COUNT 3
@@ -61,12 +58,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
         return;
     }
 
-    // printf("Got SysEx (%d): ", size);
-    // for (int i = 0; i < size; i++)
-    // {
-    //     printf("%02X ", array[i]);
-    // }
-    // printf("\n");
+    // printData(array, size, "Got SysEx");
 
     if (array[0] != OPZ_VENDOR_ID[0] || array[1] != OPZ_VENDOR_ID[1] || array[2] != OPZ_VENDOR_ID[2])
     {
@@ -84,7 +76,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
     if (parm_id == 0x01)
     {
-        // https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#01-universal-response
+        // Universal response https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#01-universal-response
         // F0 00 20 76 01 01 0C 15 55 2D 0E F7
         //
         // Sent by OP-Z every time a 00 message is received. Significance currently unknown. Bytes 10/11 match bytes 8/9 of 00 message, but with 8th bit cleared if it was set.
@@ -93,12 +85,52 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
     uint8_t output[MAX_DATA_SIZE];
     uint8_t data[MAX_DATA_SIZE];
-    decode(array + 5, size, data);
+    uint16_t dataSize = decode(array + 5, size - 5, data);
 
     LOG("parm_id %02X (%d)\n", parm_id, parm_id);
+    if (parm_id == 0x06)
+    {
+        // Button states https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#06-button-states
+        // F0 00 20 76 01 06 06 01 40 1F 1F 00 F7
+        //
+        // 8th byte 1st bit (hi) and 9th byte 7th bit (lo) indicate selected encoder mode:
+        // 00 = white, 01 = green, 10 = purple/blue, 11 = orange. 8th byte 2nd bit set = mixer
+        // button down. 8th byte 3rd bit set = record button held
+        //
+        // 10th byte: 5th bit unset = track/step button held, bits 1-4 give number of held track/step.
+        // 6th bit set = shift button held. 7th bit set = tempo button held
+        //
+        // 11th byte: 2nd bit set = screen button held. 3rd bit set = sequencer playing
+        //
+        // 12th byte: 1st bit set = track select held. 2nd bit set = program button held.
+        //
+        // Sending these messages can update encoder mode and system modes. Sending messages
+        // indicating a button is held can "lock" OPZ into having this button held until another
+        // message is sent (pressing and releasing button does not release)
+
+        // printData(data, dataSize, "Button state");
+        switch (data[0])
+        {
+        case 0x00:
+            LOG("Encoder mode: white, sound\n");
+            break;
+        case 0x40:
+            LOG("Encoder mode: green, env\n");
+            break;
+        case 0x80:
+            LOG("Encoder mode: purple, lfo or arp\n");
+            break;
+        case 0xC0:
+            LOG("Encoder mode: red, fx and level\n");
+            break;
+
+        default:
+            break;
+        }
+    }
     if (parm_id == 0x09)
     {
-        // Pattern ( https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#09-pattern )
+        // Pattern https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#09-pattern
         // F0 00 20 76 01 09 00 0A 00 36 00 00 00 78 57 1C 6D 5D 6D 0C 54 57 6E 7D 47 71 7F 3E 41 30 1E 04 42 2E
         // 40 29 61 31 40 6B 58 2F 06 1C 0C 54 59 6B 05 32 5D 5D 09 46 1E 36 06 60 5A 48 4E 62 4A 3B 72 26 45 31
         // 2F 12 79 62 35 09 42 6A 16 3B 12 60 5C 64 5D 12 0A 6C 05 2B 45 16 25 02 4A 79 1E 53 29 35 09 04 10 2F
@@ -113,8 +145,8 @@ void handleSysEx(uint8_t *array, uint16_t size)
         output[4] = 0x0B;
         uint8_t msg[8] = {0x09, 0x00, 0x00, data[1], data[2], data[3], data[4], 0x00};
         uint16_t len = encode(&msg[0], 8, &output[5]);
-        printf("len %d\n", len);
         sendSysEx(&output[0], len + 5);
+        return;
     }
 }
 
