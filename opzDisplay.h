@@ -17,6 +17,9 @@
 class OpzDisplay
 {
 public:
+    // char *track = "";
+    // char *encoderMode = "";
+
     char line[LINE_COUNT][RENDER_SIZE];
 
     void set(char *_line1, char *_line2, char *_line3)
@@ -34,6 +37,19 @@ public:
     void set(uint8_t linePos, const char *_line)
     {
         strncpy(line[linePos % LINE_COUNT], _line, RENDER_SIZE);
+    }
+
+    void setHeader(char *_track, char *_encoderMode = NULL)
+    {
+        // if (_encoderMode != NULL)
+        // {
+        //     encoderMode = _encoderMode;
+        // }
+        // if (_track != NULL)
+        // {
+        //     track = _track;
+        // }
+        // snprintf(line[0], RENDER_SIZE, "%s %s", track, encoderMode);
     }
 };
 
@@ -88,6 +104,22 @@ void handleSysEx(uint8_t *array, uint16_t size)
     uint16_t dataSize = decode(array + 5, size - 5, data);
 
     LOG("parm_id %02X (%d)\n", parm_id, parm_id);
+    if (parm_id == 0x03)
+    {
+        // Keyboard setting https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#03-keyboard-setting
+        // F0 00 20 76 01 03 00 02 05 F7
+        //
+        // 8th byte is selected octave, with octaves 2-7 represented by signed 7-byte values 7D to 02.
+        // 9th byte is selected track number.
+        //
+        // Sending this message updates appropriate values.
+
+        // printData(data, dataSize, "Keyboard setting");
+        // LOG("Keyboard setting: octave %d, track %d %s\n", data[0], data[1], trackName[data[1]]);
+        // display.setHeader(trackName[data[1]]);
+        return;
+    }
+
     if (parm_id == 0x06)
     {
         // Button states https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#06-button-states
@@ -127,7 +159,9 @@ void handleSysEx(uint8_t *array, uint16_t size)
         default:
             break;
         }
+        return;
     }
+
     if (parm_id == 0x09)
     {
         // Pattern https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#09-pattern

@@ -63,7 +63,7 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
     }
     if (command != TIMING_TICK)
     {
-        SDL_Log("%d", command);
+        SDL_Log("midiProcessMessage: 0x%02X (%d)", command, command);
     }
 
     uint8_t status = 0;
