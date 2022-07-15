@@ -277,7 +277,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
         // 26	LFO Value / Arp Style
         // 27	LFO Shape / Arp Range
 
-        printData(data, dataSize, "Sound preset");
+        // printData(data, dataSize, "Sound preset");
         display.setTrack(data[0], false);
         display.setSoundParam(data + 1);
         return;

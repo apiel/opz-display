@@ -39,6 +39,6 @@ const char *soundParamName[SOUND_PARAM_COUNT] = {
     "TBD.",
 };
 
-const char *soundParamArpName[4] = {"Speed", "Pattern", "Style", "Range"};
+const char *soundParamArpName[5] = {"Speed", "Pattern", "Style", "Range", "TBD2."};
 
 #endif
