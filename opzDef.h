@@ -38,6 +38,9 @@ const char *lfoDestName[LFO_DEST_COUNT] = {"P1", "P2", "CUTOFF", "FILTER RES.", 
 #define LFO_RATE_COUNT 8
 const char *lfoRateName[LFO_RATE_COUNT] = {"1/64", "1/32", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1"};
 
+#define ARP_PATTERN_COUNT 6
+const char *arpPatternName[ARP_PATTERN_COUNT] = {"manual", "up", "down", "up/down", "down/up", "random"};
+
 enum
 {
     SOUND_PARAM_P1,

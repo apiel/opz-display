@@ -109,9 +109,19 @@ protected:
                 }
                 else
                 {
-                    snprintf(line[2], RENDER_SIZE, "%d", (int)(value / 32) + 1);
+                    snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)(value / 32) + 1);
                 }
                 return;
+
+            case SOUND_PARAM_ARP_PATTERN:
+                strncpy(line[2], getItem(value, &arpPatternName[0], ARP_PATTERN_COUNT), RENDER_SIZE);
+                return;
+
+            case SOUND_PARAM_ARP_STYLE:
+            {
+                snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)((float)value/255.0f*6) + 1);
+                return;
+            }
 
             default:
                 break;
@@ -351,44 +361,6 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
 void handleControlChange(uint8_t channel, uint8_t cc, uint8_t value)
 {
-
-    if (cc == 9 && channel == 7)
-    {
-    }
-    else if (cc == 10 && channel == 7)
-    {
-        if (value < 21)
-        {
-            display.set(2, "manual");
-        }
-        else if (value < 43)
-        {
-            display.set(2, "up");
-        }
-        else if (value < 64)
-        {
-            display.set(2, "down");
-        }
-        else if (value < 85)
-        {
-            display.set(2, "up/down");
-        }
-        else if (value < 107)
-        {
-            display.set(2, "down/up");
-        }
-        else
-        {
-            display.set(2, "random");
-        }
-    }
-    else if (cc == 11 && channel == 7)
-    {
-        snprintf(display.line[2], RENDER_SIZE, "%d", (int)(value / 21) + 1);
-    }
-    else
-    {
-        snprintf(display.line[2], RENDER_SIZE, "%d", value);
-    }
+    snprintf(display.line[2], RENDER_SIZE, "%d", value);
 }
 #endif
