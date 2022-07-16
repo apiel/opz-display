@@ -89,9 +89,45 @@ protected:
                 }
                 return;
 
+            case SOUND_PARAM_LFO_DEPTH:
+                // TODO check range value
+                snprintf(line[2], RENDER_SIZE, "%d", value - 128);
+                return;
+
             default:
                 break;
             }
+        }
+        else
+        {
+            switch (soundParamChanged)
+            {
+            case SOUND_PARAM_ARP_SPEED:
+                if (value == 0)
+                {
+                    set(2, "Off");
+                }
+                else
+                {
+                    snprintf(line[2], RENDER_SIZE, "%d", (int)(value / 32) + 1);
+                }
+                return;
+
+            default:
+                break;
+            }
+        }
+        if (soundParamChanged == SOUND_PARAM_LEVEL)
+        {
+            if (value == 128)
+            {
+                set(2, "Center");
+            }
+            else
+            {
+                snprintf(line[2], RENDER_SIZE, "%d %s", abs(value - 128), value < 128 ? "Left" : "Right");
+            }
+            return;
         }
         snprintf(line[2], RENDER_SIZE, "%d", value);
     }
@@ -315,70 +351,9 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
 void handleControlChange(uint8_t channel, uint8_t cc, uint8_t value)
 {
-    if (cc == 10 && channel != 7)
+
+    if (cc == 9 && channel == 7)
     {
-        if (value < 8)
-        {
-            display.set(2, "1/64");
-        }
-        else if (value < 16)
-        {
-            display.set(2, "1/32");
-        }
-        else if (value < 24)
-        {
-            display.set(2, "1/16");
-        }
-        else if (value < 32)
-        {
-            display.set(2, "1/8");
-        }
-        else if (value < 40)
-        {
-            display.set(2, "1/4");
-        }
-        else if (value < 48)
-        {
-            display.set(2, "1/2");
-        }
-        else if (value < 56)
-        {
-            display.set(2, "1/1");
-        }
-        else if (value < 64)
-        {
-            display.set(2, "2/1");
-        }
-        else
-        {
-            snprintf(display.line[2], RENDER_SIZE, "%d Hz", value - 64);
-        }
-    }
-    else if (cc == 9 && channel != 7)
-    {
-        snprintf(display.line[2], RENDER_SIZE, "%d", value - 64);
-    }
-    else if (cc == 15)
-    {
-        if (value == 64)
-        {
-            display.set(2, "Center");
-        }
-        else
-        {
-            snprintf(display.line[2], RENDER_SIZE, "%d %s", abs(value - 64), value < 64 ? "Left" : "Right");
-        }
-    }
-    else if (cc == 9 && channel == 7)
-    {
-        if (value == 0)
-        {
-            display.set(2, "Off");
-        }
-        else
-        {
-            snprintf(display.line[2], RENDER_SIZE, "%d", (int)(value / 16) + 1);
-        }
     }
     else if (cc == 10 && channel == 7)
     {
