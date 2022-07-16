@@ -70,7 +70,7 @@ protected:
         {
             switch (soundParamChanged)
             {
-            case SOUND_PARAM_LFO_SHAPE_OR_ARP_RANGE:
+            case SOUND_PARAM_LFO_SHAPE:
                 strncpy(line[2], getItem(value, &lfoShapeName[0], LFO_SHAPE_COUNT), RENDER_SIZE);
                 return;
             default:
