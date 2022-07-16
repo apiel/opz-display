@@ -119,7 +119,7 @@ protected:
 
             case SOUND_PARAM_ARP_STYLE:
             {
-                snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)((float)value/255.0f*6) + 1);
+                snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)((float)value / 255.0f * 6) + 1);
                 return;
             }
 
@@ -361,6 +361,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
 void handleControlChange(uint8_t channel, uint8_t cc, uint8_t value)
 {
-    snprintf(display.line[2], RENDER_SIZE, "%d", value);
+    display.set(1, "Restart");
+    display.set(2, "OP-Z");
 }
 #endif
