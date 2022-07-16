@@ -32,6 +32,9 @@ const char *lfoShapeName[LFO_SHAPE_COUNT] = {
     "ONCE triggered",
 };
 
+#define LFO_DEST_COUNT 8
+const char *lfoDestName[LFO_DEST_COUNT] = { "P1", "P2", "CUTOFF", "FILTER RES.", "ATTACK", "PITCH", "PAN", "VOLUME" };
+
 enum
 {
     SOUND_PARAM_P1,
@@ -73,7 +76,7 @@ const char *soundParamName[SOUND_PARAM_COUNT] = {
     "FX Send 1",
     "FX Send 2",
     "Cutoff",
-    "Res",
+    "Filter Res.",
     "Pan",
     "Level",
     "Portamento",
