@@ -78,6 +78,17 @@ protected:
                 strncpy(line[2], getItem(value, &lfoDestName[0], LFO_DEST_COUNT), RENDER_SIZE);
                 return;
 
+            case SOUND_PARAM_LFO_RATE:
+                if (value < 128)
+                {
+                    strncpy(line[2], getItem(value, &lfoRateName[0], LFO_RATE_COUNT * 2), RENDER_SIZE);
+                }
+                else
+                {
+                    snprintf(line[2], RENDER_SIZE, "%d Hz", (uint8_t)((float)(value - 128) * 0.78125f) + 1); // 1/128*100
+                }
+                return;
+
             default:
                 break;
             }
