@@ -193,7 +193,7 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
         // printData(data, dataSize, "Keyboard setting");
         // LOG("Keyboard setting: octave %d, track %d %s\n", data[0], data[1], trackName[data[1]]);
-        display.setTrack(data[1]);
+        display.setTrack(data[1] % 16); // %16 because will playing kick is 16 instead of 0, snare 17... we can actually use this to know if it is playing
 
         return;
     }

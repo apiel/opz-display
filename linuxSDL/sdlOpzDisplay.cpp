@@ -63,7 +63,7 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
     }
     if (command != TIMING_TICK)
     {
-        SDL_Log("midiProcessMessage: 0x%02X (%d)", command, command);
+        // SDL_Log("midiProcessMessage: 0x%02X (%d)", command, command);
     }
 
     uint8_t status = 0;
@@ -83,7 +83,7 @@ void midiProcessMessage(double _deltatime, std::vector<unsigned char> *_message,
     switch (status)
     {
     case CONTROLLER_CHANGE:
-        SDL_Log("CONTROLLER_CHANGE");
+        // SDL_Log("CONTROLLER_CHANGE");
         handleControlChange(channel, _message->at(1), _message->at(2));
         break;
 
