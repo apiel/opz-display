@@ -204,6 +204,12 @@ void render(SDL_Surface *screenSurface)
     draw_string(screenSurface, display.line[0], 2, 6, 3);
     draw_string(screenSurface, display.line[1], 2, 50, 4);
     draw_string(screenSurface, display.line[2], 2, 100, 4);
+
+    if (display.drawValue)
+    {
+        SDL_Rect r = {5, SCREEN_HEIGHT - 20, (float)display.drawValue / 100.0f * (SCREEN_WIDTH-10), 4};
+        SDL_FillRect(screenSurface, &r, SDL_MapRGB(screenSurface->format, UI_COLOR_BAR));
+    }
 }
 
 int main(int argc, char *args[])
