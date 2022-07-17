@@ -16,12 +16,19 @@ U8G2_SSD1306_72X40_ER_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE); // EastR
 
 #define LOG(...) Serial.printf(__VA_ARGS__)
 
-#include "opzDisplay.h"
-
 // USB MIDI object
 Adafruit_USBD_MIDI usb_midi;
 
 MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
+
+// Must be before opzDisplay.h
+#define MIDI_INTERFACE_H
+void sendSysEx(uint8_t *inArray, uint16_t len)
+{
+    MIDI.sendSysEx(len, inArray);
+}
+
+#include "opzDisplay.h"
 
 unsigned long lastDraw = 0;
 void draw()
@@ -43,6 +50,30 @@ void draw()
   }
 }
 
+unsigned long lastHeartBeat = 0;
+void heartBeat()
+{
+  if (millis() - lastHeartBeat > 1000)
+  {
+    lastHeartBeat = millis();
+    sendHeartBeat();
+  }
+}
+
+void handleSysExIno(byte *array, unsigned size)
+{
+  // display.set(0, "sysex");
+  // sprintf(display.line[1], "size: %d", size);
+  // if (size > 1)
+  // {
+  //   sprintf(display.line[2], "%02X %02X", array[0], array[1]);
+  // } else {
+  //   sprintf(display.line[2], "%02X", array[0]);
+  // }
+
+  handleSysEx((uint8_t *)array + 1, (uint16_t)size - 2);
+}
+
 void setup(void)
 {
   Wire.setSDA(22);
@@ -50,7 +81,7 @@ void setup(void)
   Wire.begin();
   u8g2.begin();
 
-  display.set((char *)"Connect OPZ", (char *)"OP-Z", (char *)"Display");
+  display.set((char *)"Connect OPZ", (char *)"OP-Z v0.1", (char *)"Display");
 
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
   // Manual begin() is required on core without built-in support for TinyUSB such as mbed rp2040
@@ -66,20 +97,20 @@ void setup(void)
   Serial.println("OPZ Display");
 
   MIDI.setHandleControlChange(handleControlChange);
-  MIDI.setHandleSystemExclusive(handleSysEx);
+
+  // MIDI.setHandleSystemExclusive((void (*)(byte * array, unsigned size))handleSysEx);
+  MIDI.setHandleSystemExclusive(handleSysExIno);
 
   // wait until device mounted
   while (!TinyUSBDevice.mounted())
     delay(1);
 
   midiInitSysExOpz();
-
-  byte inArray[4] = {0x7E, 0x7F, 0x06, 0x01};
-  MIDI.sendSysEx(4, &inArray[0]);
 }
 
 void loop(void)
 {
   MIDI.read();
   draw();
+  heartBeat();
 }
