@@ -25,7 +25,7 @@ MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
 #define MIDI_INTERFACE_H
 void sendSysEx(uint8_t *inArray, uint16_t len)
 {
-    MIDI.sendSysEx(len, inArray);
+    MIDI.sendSysEx(len, inArray, false);
 }
 
 #include "opzDisplay.h"
