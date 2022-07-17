@@ -129,6 +129,7 @@ protected:
         }
         if (soundParamChanged == SOUND_PARAM_LEVEL)
         {
+            // TODO instead to show text, make a visual representation
             if (value == 128)
             {
                 set(2, "Center");
@@ -140,6 +141,7 @@ protected:
             return;
         }
         snprintf(line[2], RENDER_SIZE, "%d", value);
+        // TODO visual representation for envelop
     }
 
 public:
