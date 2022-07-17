@@ -20,7 +20,6 @@ protected:
     uint8_t track;
     uint8_t encoderMode;
     uint8_t soundParam[SOUND_PARAM_COUNT] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    uint8_t soundParamChanged = 0;
 
     const char *getTrackName()
     {
@@ -59,16 +58,15 @@ protected:
         strcpy(line[2], "");
     }
 
-    void renderSoundParam()
+    void renderSoundParam(uint8_t paramId, uint8_t value)
     {
         renderHeader();
-        strncpy(line[1], getSoundParamName(soundParamChanged), RENDER_SIZE);
+        strncpy(line[1], getSoundParamName(paramId), RENDER_SIZE);
         // strncpy(line[2], getEncoderModeName(), RENDER_SIZE);
 
-        uint8_t value = soundParam[soundParamChanged];
         if (track != TRACK_ARP)
         {
-            switch (soundParamChanged)
+            switch (paramId)
             {
             case SOUND_PARAM_LFO_SHAPE:
                 strncpy(line[2], getItem(value, &lfoShapeName[0], LFO_SHAPE_COUNT), RENDER_SIZE);
@@ -100,7 +98,7 @@ protected:
         }
         else
         {
-            switch (soundParamChanged)
+            switch (paramId)
             {
             case SOUND_PARAM_ARP_SPEED:
                 if (value == 0)
@@ -127,7 +125,7 @@ protected:
                 break;
             }
         }
-        if (soundParamChanged == SOUND_PARAM_LEVEL)
+        if (paramId == SOUND_PARAM_LEVEL)
         {
             // TODO instead to show text, make a visual representation
             if (value == 128)
@@ -181,16 +179,17 @@ public:
 
     void setSoundParam(uint8_t *_soundParam)
     {
+        uint8_t modifiedParamId = 0;
         for (uint8_t i = 0; i < SOUND_PARAM_COUNT; i++)
         {
             // printf("%d == %d\n", soundParam[i], _soundParam[i]);
             if (soundParam[i] != _soundParam[i])
             {
                 soundParam[i] = _soundParam[i];
-                soundParamChanged = i;
+                modifiedParamId = i;
             }
         }
-        renderSoundParam();
+        renderSoundParam(modifiedParamId, soundParam[modifiedParamId]);
     }
 };
 
