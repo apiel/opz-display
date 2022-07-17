@@ -49,7 +49,11 @@ void draw()
     u8g2.drawStr(0, 0, display.line[0]);
     u8g2.setFont(u8g2_font_7x14_tf);
     u8g2.drawStr(0, 10, display.line[1]);
+    // if (display.drawPan != -1) {
+
+    // } else {
     u8g2.drawStr(0, 24, display.line[2]);
+    // }
     if (display.drawValue)
     {
       u8g2.drawBox(0, 38, (float)display.drawValue / 100.0f * 72, 2);

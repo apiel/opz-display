@@ -61,6 +61,7 @@ protected:
     void renderSoundParam(uint8_t paramId, uint8_t value)
     {
         drawValue = 0;
+        drawPan = -1;
         renderHeader();
         strncpy(line[1], getSoundParamName(paramId), RENDER_SIZE);
         // strncpy(line[2], getEncoderModeName(), RENDER_SIZE);
@@ -126,27 +127,23 @@ protected:
                 break;
             }
         }
-        if (paramId == SOUND_PARAM_LEVEL)
+        if (paramId == SOUND_PARAM_PAN)
         {
-            // TODO instead to show text, make a visual representation
-            if (value == MID_VALUE)
-            {
-                set(2, "Center");
-            }
-            else
-            {
-                snprintf(line[2], RENDER_SIZE, "%d %s", abs(value - MID_VALUE), value < MID_VALUE ? "Left" : "Right");
-            }
+            drawPan = (uint8_t)((float)value / MAX_VALUE * 100);
+            snprintf(line[2], RENDER_SIZE, "L %d R %d", abs(drawPan - 100), drawPan);
             return;
         }
-        snprintf(line[2], RENDER_SIZE, "%d", value);
         drawValue = (float)value / MAX_VALUE * 100;
+        snprintf(line[2], RENDER_SIZE, "%d", drawValue);
+        // snprintf(line[2], RENDER_SIZE, "%d", value);
+
         // TODO visual representation for envelop
     }
 
 public:
     char line[LINE_COUNT][RENDER_SIZE];
     int8_t drawValue = 0;
+    int8_t drawPan = -1;
 
     void set(char *_line1, char *_line2, char *_line3)
     {

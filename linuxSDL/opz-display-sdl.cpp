@@ -203,11 +203,31 @@ void render(SDL_Surface *screenSurface)
     // SDL_Log("\n%s\n%s\n%s\n", display.line[0], display.line[1], display.line[2]);
     draw_string(screenSurface, display.line[0], 2, 6, 3);
     draw_string(screenSurface, display.line[1], 2, 50, 4);
-    draw_string(screenSurface, display.line[2], 2, 100, 4);
+
+    if (display.drawPan != -1)
+    {
+        snprintf(display.line[2], RENDER_SIZE, "L %d", abs(display.drawPan - 100));
+        draw_string(screenSurface, display.line[2], 2, 100, 2);
+        snprintf(display.line[2], RENDER_SIZE, "R %d", display.drawPan);
+        draw_string(screenSurface, display.line[2], 130, 100, 2);
+
+        SDL_Rect r = {5, SCREEN_HEIGHT - 20, SCREEN_WIDTH - 10, 4};
+        SDL_FillRect(screenSurface, &r, SDL_MapRGB(screenSurface->format, UI_COLOR_BAR));
+
+        SDL_Rect r1 = {SCREEN_WIDTH * 0.5f - 2, SCREEN_HEIGHT - 20, 4, 4};
+        SDL_FillRect(screenSurface, &r1, SDL_MapRGB(screenSurface->format, UI_COLOR_BG));
+
+        SDL_Rect r2 = {5 + ((float)(SCREEN_WIDTH - 10 - 4) / 100.0f * display.drawPan), SCREEN_HEIGHT - 40, 4, 20};
+        SDL_FillRect(screenSurface, &r2, SDL_MapRGB(screenSurface->format, UI_COLOR_BAR));
+    }
+    else
+    {
+        draw_string(screenSurface, display.line[2], 2, 100, 4);
+    }
 
     if (display.drawValue)
     {
-        SDL_Rect r = {5, SCREEN_HEIGHT - 20, (float)display.drawValue / 100.0f * (SCREEN_WIDTH-10), 4};
+        SDL_Rect r = {5, SCREEN_HEIGHT - 20, (float)display.drawValue / 100.0f * (SCREEN_WIDTH - 10), 4};
         SDL_FillRect(screenSurface, &r, SDL_MapRGB(screenSurface->format, UI_COLOR_BAR));
     }
 }
