@@ -17,7 +17,7 @@ void printData(uint8_t *data, int size, const char *label = "Data")
 
 const char * getItem(uint8_t value, const char ** list, uint8_t size)
 {
-    uint8_t val = (float)value / 255.0f * (float)size;
+    uint8_t val = (float)value / MAX_VALUE * (float)size;
     return list[val >= size ? size - 1 : val];
 }
 

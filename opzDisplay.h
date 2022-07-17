@@ -77,19 +77,19 @@ protected:
                 return;
 
             case SOUND_PARAM_LFO_RATE:
-                if (value < 128)
+                if (value < MID_VALUE)
                 {
                     strncpy(line[2], getItem(value, &lfoRateName[0], LFO_RATE_COUNT * 2), RENDER_SIZE);
                 }
                 else
                 {
-                    snprintf(line[2], RENDER_SIZE, "%d Hz", (uint8_t)((float)(value - 128) * 0.78125f) + 1); // 1/128*100
+                    snprintf(line[2], RENDER_SIZE, "%d Hz", (uint8_t)((float)(value - MID_VALUE) / (float)MID_VALUE * 100) + 1);
                 }
                 return;
 
             case SOUND_PARAM_LFO_DEPTH:
                 // TODO check range value
-                snprintf(line[2], RENDER_SIZE, "%d", value - 128);
+                snprintf(line[2], RENDER_SIZE, "%d", value - MID_VALUE);
                 return;
 
             default:
@@ -107,7 +107,7 @@ protected:
                 }
                 else
                 {
-                    snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)(value / 32) + 1);
+                    snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)(value / ((MAX_VALUE + 1) / 8)) + 1);
                 }
                 return;
 
@@ -117,7 +117,7 @@ protected:
 
             case SOUND_PARAM_ARP_STYLE:
             {
-                snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)((float)value / 255.0f * 6) + 1);
+                snprintf(line[2], RENDER_SIZE, "%d", (uint8_t)((float)value / MAX_VALUE * 6) + 1);
                 return;
             }
 
@@ -128,13 +128,13 @@ protected:
         if (paramId == SOUND_PARAM_LEVEL)
         {
             // TODO instead to show text, make a visual representation
-            if (value == 128)
+            if (value == MID_VALUE)
             {
                 set(2, "Center");
             }
             else
             {
-                snprintf(line[2], RENDER_SIZE, "%d %s", abs(value - 128), value < 128 ? "Left" : "Right");
+                snprintf(line[2], RENDER_SIZE, "%d %s", abs(value - MID_VALUE), value < MID_VALUE ? "Left" : "Right");
             }
             return;
         }
@@ -191,19 +191,29 @@ public:
         }
         renderSoundParam(modifiedParamId, soundParam[modifiedParamId]);
     }
+
+    void setSoundParam(uint8_t paramId, uint8_t value)
+    {
+        soundParam[paramId] = value;
+        renderSoundParam(paramId, value);
+    }
 };
 
 OpzDisplay display;
 
 void midiInitSysExOpz()
 {
-    LOG("Starting MIDI\n");
+#if USE_SYSEX
+    LOG("Starting SYSEX\n");
     sendSysEx((uint8_t *)OPZ_INIT, 4);
+#endif
 }
 
 void sendHeartBeat()
 {
+#if USE_SYSEX
     sendSysEx((uint8_t *)OPZ_HEARTBEAT, 9);
+#endif
 }
 
 void handleSysEx(uint8_t *array, uint16_t size)
@@ -363,7 +373,14 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
 void handleControlChange(uint8_t channel, uint8_t cc, uint8_t value)
 {
+#if USE_SYSEX
     display.set(1, "Restart");
     display.set(2, "OP-Z");
+#else
+    display.setTrack(channel - 1, false);
+    // display.setSoundParam(cc, value);
+    display.setEncoderMode((uint8_t)((float)(cc - 1) / 4.0f));
+    display.setSoundParam(cc2paramId[cc - 1], value);
+#endif
 }
 #endif

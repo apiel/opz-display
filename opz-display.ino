@@ -28,6 +28,10 @@ void sendSysEx(uint8_t *inArray, uint16_t len)
     MIDI.sendSysEx(len, inArray, false);
 }
 
+// For the moment RP2040 is too slow to handle sysex without to impact OP-Z performance.
+// Let's see if ESP32 could handle it better...
+#define USE_SYSEX false
+
 #include "opzDisplay.h"
 
 unsigned long lastDraw = 0;
