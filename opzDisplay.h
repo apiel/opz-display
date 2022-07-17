@@ -231,12 +231,14 @@ void handleSysEx(uint8_t *array, uint16_t size)
 
     uint8_t parm_id = array[4];
 
-    if (parm_id == 0x01)
+    // if (parm_id != 0x01)
+    // {
+    //     LOG("parm_id %02X (%d)\n", parm_id, parm_id);
+    // }
+
+    if (parm_id != 0x03 && parm_id != 0x06 && parm_id != 0x09 && parm_id != 0x0e)
     {
-        // Universal response https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#01-universal-response
-        // F0 00 20 76 01 01 0C 15 55 2D 0E F7
-        //
-        // Sent by OP-Z every time a 00 message is received. Significance currently unknown. Bytes 10/11 match bytes 8/9 of 00 message, but with 8th bit cleared if it was set.
+        // Save processing time by ignoring non-treated messages
         return;
     }
 
@@ -244,7 +246,6 @@ void handleSysEx(uint8_t *array, uint16_t size)
     uint8_t data[MAX_DATA_SIZE];
     uint16_t dataSize = decode(array + 5, size - 5, data);
 
-    LOG("parm_id %02X (%d)\n", parm_id, parm_id);
     if (parm_id == 0x03)
     {
         // Keyboard setting https://github.com/hyphz/opzdoc/wiki/MIDI-Protocol#03-keyboard-setting
