@@ -60,6 +60,7 @@ protected:
 
     void renderSoundParam(uint8_t paramId, uint8_t value)
     {
+        drawValue = 0;
         renderHeader();
         strncpy(line[1], getSoundParamName(paramId), RENDER_SIZE);
         // strncpy(line[2], getEncoderModeName(), RENDER_SIZE);
@@ -139,11 +140,13 @@ protected:
             return;
         }
         snprintf(line[2], RENDER_SIZE, "%d", value);
+        drawValue = (float)value / MAX_VALUE * 100;
         // TODO visual representation for envelop
     }
 
 public:
     char line[LINE_COUNT][RENDER_SIZE];
+    int8_t drawValue = 0;
 
     void set(char *_line1, char *_line2, char *_line3)
     {

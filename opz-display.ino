@@ -25,7 +25,7 @@ MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
 #define MIDI_INTERFACE_H
 void sendSysEx(uint8_t *inArray, uint16_t len)
 {
-    MIDI.sendSysEx(len, inArray, false);
+  MIDI.sendSysEx(len, inArray, false);
 }
 
 // For the moment RP2040 is too slow to handle sysex without to impact OP-Z performance.
@@ -50,6 +50,10 @@ void draw()
     u8g2.setFont(u8g2_font_7x14_tf);
     u8g2.drawStr(0, 10, display.line[1]);
     u8g2.drawStr(0, 24, display.line[2]);
+    if (display.drawValue)
+    {
+      u8g2.drawBox(0, 38, (float)display.drawValue / 100.0f * 72, 2);
+    }
     u8g2.sendBuffer();
   }
 }
