@@ -37,7 +37,7 @@ void sendSysEx(uint8_t *inArray, uint16_t len)
 unsigned long lastDraw = 0;
 void draw()
 {
-  if (millis() - lastDraw > 100)
+  if (millis() - lastDraw > 200)
   {
     lastDraw = millis();
     u8g2.clearBuffer();
